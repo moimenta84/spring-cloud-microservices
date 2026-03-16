@@ -1,6 +1,9 @@
 package com.springcloud.msvc.usuarios.models.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name="users")
@@ -13,13 +16,16 @@ public class User {
     public Long getId() {
         return id;
     }
-
+    @NotEmpty
     @Column(name = "name")
     private String name;
 
+    @NotEmpty
+    @Email
     @Column(unique = true)
     private String email;
 
+    @NotEmpty
     private String password;
 
     public User() {}
