@@ -1,6 +1,7 @@
 package com.example.cloud.msvc.cursos.models.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name="courses")
@@ -10,6 +11,7 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     @Column(name="name")
     private String name;
 
