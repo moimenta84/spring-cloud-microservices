@@ -2,28 +2,35 @@ package com.example.cloud.msvc.cursos.controllers;
 
 import com.example.cloud.msvc.cursos.models.entity.Course;
 import com.example.cloud.msvc.cursos.services.CourseService;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+// REST controller that exposes CRUD endpoints for Course management
 @RestController
 @RequestMapping
 public class CourseController {
 
-
+    // Injects the course service to handle business logic
     @Autowired
     private CourseService service;
 
-
+    // Returns the list of all courses
     @GetMapping("/")
     public List<Course> index(){
         return service.index();
     }
 
+    // Returns a single course by its ID, or 404 if not found
     @GetMapping("/{id}")
     public ResponseEntity<?> show(@PathVariable Long id){
 
@@ -36,15 +43,24 @@ public class CourseController {
 
     }
 
+    // Creates a new course after validating the request body
     @PostMapping
-    public ResponseEntity<?> store(@RequestBody Course course){
+    public ResponseEntity<?> store(@Valid @RequestBody Course course, BindingResult result){
+
+        if(result.hasErrors()){
+            return validated(result);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(course));
     }
 
+    // Updates an existing course by ID after validating the request body
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@RequestBody Course course,@PathVariable Long id){
+    public ResponseEntity<?> update(@Valid @RequestBody Course course, BindingResult result, @PathVariable Long id){
 
         Optional<Course> courseOptional = service.byId(id);
+        if(result.hasErrors()){
+            return validated(result);
+        }
 
         if(courseOptional.isEmpty()){
             return ResponseEntity.notFound().build();
@@ -55,6 +71,7 @@ public class CourseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(course));
     }
 
+    // Deletes a course by ID, returns 404 if not found or 204 on success
     @DeleteMapping("/{id}")
     public ResponseEntity<?> destroy(@PathVariable Long id){
 
@@ -66,6 +83,14 @@ public class CourseController {
         return ResponseEntity.noContent().build();
     }
 
-
+    // Builds a map of field validation errors and returns a 400 Bad Request response
+    private static @Nullable ResponseEntity<Map<String, String>> validated(BindingResult result) {
+        if(result.hasErrors()){
+            Map<String,String> errors = new HashMap<>();
+            result.getFieldErrors().forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors);
+        }
+        return null;
+    }
 
 }
