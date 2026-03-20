@@ -1,7 +1,9 @@
 package com.example.cloud.msvc.cursos.controllers;
 
 import com.example.cloud.msvc.cursos.models.entity.Course;
+import com.example.cloud.msvc.cursos.models.entity.User;
 import com.example.cloud.msvc.cursos.services.CourseService;
+import feign.FeignException;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,10 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 // REST controller that exposes CRUD endpoints for Course management
 @RestController
@@ -40,7 +39,6 @@ public class CourseController {
         }
 
         return ResponseEntity.ok(userOptional.get());
-
     }
 
     // Creates a new course after validating the request body
@@ -83,6 +81,68 @@ public class CourseController {
         return ResponseEntity.noContent().build();
     }
 
+    // Assigns an existing user to a course by course ID, returns 404 if user not found in msvc-users
+    @PutMapping("/assigned-user/{courseId}")
+    public ResponseEntity<?> assignedUser(@RequestBody User user, @PathVariable Long courseId) {
+        Optional<Course> userOptional;
+
+        try {
+            userOptional = service.byId(courseId);
+        } catch (FeignException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "No existe usuario en msvc-users" + e.getMessage()));
+        }
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userOptional.get());
+
+    }
+
+    // Creates a new user and associates it with a course by course ID via msvc-users
+    @PostMapping("/create-user/{courseId}")
+    public ResponseEntity<?> createUser(@RequestBody User user, @PathVariable Long courseId) {
+        Optional<Course> userOptional;
+
+        try {
+            userOptional = service.byId(courseId);
+        } catch (FeignException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "No se pudo crear el usuario" + e.getMessage()));
+        }
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userOptional.get());
+
+    }
+
+
+    // Removes a user from a course by course ID, communicates with msvc-users via Feign
+    @DeleteMapping("/delete-user/{courseId}")
+    public ResponseEntity<?> deleteUser(@RequestBody User user, @PathVariable Long courseId) {
+        
+        Optional<Course> userOptional;
+
+        try {
+            userOptional = service.byId(courseId);
+        } catch (FeignException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "No se pudo crear el usuario" + e.getMessage()));
+        }
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userOptional.get());
+
+    }
+
     // Builds a map of field validation errors and returns a 400 Bad Request response
     private static @Nullable ResponseEntity<Map<String, String>> validated(BindingResult result) {
         if(result.hasErrors()){
@@ -92,5 +152,4 @@ public class CourseController {
         }
         return null;
     }
-
 }
