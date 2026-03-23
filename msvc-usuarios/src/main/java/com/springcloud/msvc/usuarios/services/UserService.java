@@ -10,6 +10,8 @@ public interface UserService {
     Optional<User>byId(Long id);
     User save(User user);
     void delete(Long id);
+    List<User> indexForIds(Iterable<Long> ids);
     Optional<User>byEmail(String email);
+
 
 }

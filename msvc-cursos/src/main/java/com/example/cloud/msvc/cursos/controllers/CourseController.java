@@ -33,7 +33,7 @@ public class CourseController {
     @GetMapping("/{id}")
     public ResponseEntity<?> show(@PathVariable Long id){
 
-        Optional<Course> userOptional = service.byId(id);
+        Optional<Course> userOptional = service.forIdUser(id);
         if(userOptional.isEmpty()){
             return ResponseEntity.notFound().build();
         }

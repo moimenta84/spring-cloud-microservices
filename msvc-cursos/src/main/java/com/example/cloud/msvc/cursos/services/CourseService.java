@@ -32,4 +32,6 @@ public interface CourseService {
     // Removes a user assignment from a course
     Optional<User> desAssignUser(User user, Long courseId);
 
+    Optional<Course> forIdUser(Long courseId);
+
 }

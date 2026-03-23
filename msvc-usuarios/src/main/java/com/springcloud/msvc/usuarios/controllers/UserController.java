@@ -89,6 +89,10 @@ public class UserController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("users-Course")
+    public ResponseEntity<List<User>> getUsersByCourse(@RequestParam List<Long> ids){
+        return ResponseEntity.ok(service.indexForIds(ids));
+    }
 
     private static @Nullable ResponseEntity<Map<String, String>>validated(BindingResult result) {
         if(result.hasErrors()){

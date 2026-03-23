@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * CourseService implementation.
@@ -128,6 +129,26 @@ public class CourserServiceImpl implements CourseService {
             course.removeCourseUser(coursersUsers);
             repository.save(course);
             return Optional.of(usuarioMsvc);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Course> forIdUser(Long id) {
+        Optional<Course> o = repository.findById(id);
+        if (o.isPresent()) {
+            Course course = o.get();
+            if (!course.getCourseUsers().isEmpty()) {
+                List<Long> ids = course.getCourseUsers()
+                        .stream()
+                        .map(CoursesUsers::getUserId)
+                        .collect(Collectors.toList());
+
+                List<User> users = client.getUsersByCourse(ids);
+                course.setUsers(users);
+            }
+            return Optional.of(course);
         }
         return Optional.empty();
     }

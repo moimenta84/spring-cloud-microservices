@@ -43,5 +43,11 @@ public class UserServiceImpl implements UserService{
     public Optional<User> byEmail(String email) {
         return repository.findByEmail(email);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> indexForIds(Iterable<Long> ids) {
+        return (List<User>) repository.findAllById(ids);
+    }
 }
 
