@@ -3,7 +3,7 @@ package com.springcloud.msvc.usuarios.controllers;
 import com.springcloud.msvc.usuarios.models.entity.User;
 import com.springcloud.msvc.usuarios.services.UserService;
 import jakarta.validation.Valid;
-import org.jspecify.annotations.Nullable;
+import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.beans.factory.annotation.Autowired;
