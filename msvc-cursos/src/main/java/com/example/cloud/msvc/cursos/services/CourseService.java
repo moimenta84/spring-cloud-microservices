@@ -21,6 +21,7 @@ public interface CourseService {
     // Deletes a course by its ID
     void delete(Long id);
 
+
     // --- Methods that communicate with msvc-users microservice ---
 
     // Assigns an existing user (from msvc-users) to a course

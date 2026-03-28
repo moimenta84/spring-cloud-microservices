@@ -123,7 +123,6 @@ public class CourseController {
     @DeleteMapping("/delete-user/{courseId}")
     public ResponseEntity<?> deleteUser(@RequestBody User user, @PathVariable Long courseId) {
         Optional<User> userOptional;
-
         try {
             userOptional = service.desAssignUser(user, courseId);
         } catch (FeignException e) {
